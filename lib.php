@@ -648,8 +648,8 @@ function turnitin_get_url($tii, $plagiarismsettings, $returnarray=false, $pid=''
     global $CFG, $DB;
 
     //make sure all $tii values are clean.
-    foreach ($tii as $key => $value) {
-        if (!empty($value) AND $key <> 'tem' AND $key <> 'uem' AND $key <> 'dtstart' AND $key <> 'dtdue' AND $key <> 'submit_date') {
+    foreach($tii as $key => $value) {
+        if (!empty($value) AND $key <> 'tem' AND $key <> 'uem' AND $key <> 'dtstart' AND $key <> 'dtdue' AND $key <> 'dtpost' AND $key <> 'submit_date') {
             $value = rawurldecode($value); //decode url first. (in case has already be encoded - don't want to end up with double % replacements)
             $value = rawurlencode($value);
             $value = str_replace('%20', '_', $value);
@@ -686,6 +686,9 @@ function turnitin_get_url($tii, $plagiarismsettings, $returnarray=false, $pid=''
     }
     if (!isset($tii['dtstart'])) {
         $tii['dtstart'] = '';
+    }
+	if (!isset($tii['dtpost'])) {
+        $tii['dtpost'] = '';
     }
     if (!isset($tii['newassign'])) {
         $tii['newassign'] = '';
@@ -786,6 +789,7 @@ function turnitin_get_md5string($tii, $plagiarismsettings) {
                 $tii['dis'].
                 $tii['dtdue'].
                 $tii['dtstart'].
+                $tii['dtpost'].
                 $tii['encrypt'].
                 $tii['fcmd'].
                 $tii['fid'].
@@ -1204,17 +1208,29 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
                 $timestartconfig->name = 'turnitin_dtstart';
                 $timestartconfig->value = $tii['dtstart'];
                 $DB->insert_record('plagiarism_turnitin_config', $timestartconfig);
-
+                $tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', time() + (365 * 24 * 60 * 60)));
                 $tii['dtdue'] = rawurlencode(date($tunitindateformat, strtotime('+1 year')));
             } else {
                 $tii['assignid'] = $plagiarismvalues['turnitin_assignid'];
                 $tii['fcmd'] = TURNITIN_UPDATE_RETURN_XML;
-                $tii['dtstart']  = $DB->get_field('plagiarism_turnitin_config', 'value', array('cm' => $cm->id,
-                                                                                    'name' => 'turnitin_dtstart'));
-                if (empty($module->timedue)) {
-                    $tii['dtdue'] = rawurlencode(date($tunitindateformat, strtotime('+1 year')));
+                if(isset($eventdata->timeavailable)) {
+                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $eventdata->timeavailable));
+                }elseif (empty($module->timeavailable)) {
+                    $tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', time()));
                 } else {
-                    $tii['dtdue']    = rawurlencode(date($tunitindateformat, $module->timedue));
+                    $tii['dtstart']  = rawurlencode(date('Y-m-d H:i:s', $module->timeavailable));
+                }
+            	if(isset($eventdata->timedue)) {
+                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $eventdata->timedue));
+                }elseif (empty($module->timedue)) {
+                    $tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', time()+(365 * 24 * 60 * 60)));
+                } else {
+                    $tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $module->timedue));
+                }
+            	if(isset($eventdata->feedbackavailable)) {
+                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $eventdata->feedbackavailable));
+                }else {
+                    $tii['dtpost']    = rawurlencode(date('Y-m-d H:i:s', $module->timedue+(365 * 24 * 60 * 60)));
                 }
             }
             $tii['assign']   = turnitin_get_assign_name($module->name, $cm->id); //assignment name stored in TII
