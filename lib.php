@@ -1147,6 +1147,14 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
         debugging("invalid instanceid! - instance:".$cm->instance, DEBUG_DEVELOPER);
         return true; //don't let this event kill cron
     }
+    
+    //Check whether the module has a date definition function
+    require_once("$CFG->dirroot/mod/".$module->name."/locallib.php"); //JB - Get localib from module to check which values this needs to send
+    $date_function = $module->name."_plagiarism_dates";
+    if(function_exists($submission_function)) {
+       $dates = $date_function($cm->id);
+    } 
+    
     if (!$user = $DB->get_record('user', array('id'=>$eventdata->userid))) {
         debugging("invalid userid! - :".$eventdata->userid, DEBUG_DEVELOPER);
         return true; //don't let this event kill cron
@@ -1213,12 +1221,7 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
             } else {
                 $tii['assignid'] = $plagiarismvalues['turnitin_assignid'];
                 $tii['fcmd'] = TURNITIN_UPDATE_RETURN_XML;
-
-                require_once("$CFG->dirroot/mod/".$module->name."/locallib.php"); //JB - Get localib from module to check which values this needs to send
-        		$date_function = $module->name."_plagiarism_dates";
-                if(function_exists($submission_function)) {
-        			$dates = $date_function($cm->id);
-        		}                
+           
                 if(isset($dates->timeavailable)) {
                 	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $dates->timeavailable));
                 }elseif (empty($module->timeavailable)) {
@@ -1298,6 +1301,15 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
                     if (!empty($module->timedue)) {
                         $tii['dtdue']    = rawurlencode(date($tunitindateformat, $module->timedue));
                     }
+                }
+            	if(isset($dates->timeavailable)) {
+                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $dates->timeavailable));
+                }
+            	if(isset($dates->timedue)) {
+                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $dates->timedue));
+                }
+            	if(isset($dates->feedback)) {
+                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $dates->feedback));
                 }
                 $tiixml = turnitin_post_data($tii, $plagiarismsettings);
             }
