@@ -1213,22 +1213,28 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
             } else {
                 $tii['assignid'] = $plagiarismvalues['turnitin_assignid'];
                 $tii['fcmd'] = TURNITIN_UPDATE_RETURN_XML;
-                if(isset($eventdata->timeavailable)) {
-                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $eventdata->timeavailable));
+
+                require_once("$CFG->dirroot/mod/".$module->name."/locallib.php"); //JB - Get localib from module to check which values this needs to send
+        		$date_function = $module->name."_plagiarism_dates";
+                if(function_exists($submission_function)) {
+        			$dates = $date_function($cm->id);
+        		}                
+                if(isset($dates->timeavailable)) {
+                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $dates->timeavailable));
                 }elseif (empty($module->timeavailable)) {
                     $tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', time()));
                 } else {
                     $tii['dtstart']  = rawurlencode(date('Y-m-d H:i:s', $module->timeavailable));
                 }
-            	if(isset($eventdata->timedue)) {
-                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $eventdata->timedue));
+            	if(isset($dates->timedue)) {
+                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $dates->timedue));
                 }elseif (empty($module->timedue)) {
                     $tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', time()+(365 * 24 * 60 * 60)));
                 } else {
                     $tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $module->timedue));
                 }
-            	if(isset($eventdata->feedbackavailable)) {
-                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $eventdata->feedbackavailable));
+            	if(isset($dates->feedback)) {
+                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $dates->feedback));
                 }else {
                     $tii['dtpost']    = rawurlencode(date('Y-m-d H:i:s', $module->timedue+(365 * 24 * 60 * 60)));
                 }
