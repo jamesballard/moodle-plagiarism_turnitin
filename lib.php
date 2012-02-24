@@ -1222,22 +1222,22 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
                 $tii['assignid'] = $plagiarismvalues['turnitin_assignid'];
                 $tii['fcmd'] = TURNITIN_UPDATE_RETURN_XML;
            
-                if(isset($dates->timeavailable)) {
-                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $dates->timeavailable));
+                if(isset($dates['timeavailable'])) {
+                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $dates['timeavailable']));
                 }elseif (empty($module->timeavailable)) {
                     $tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', time()));
                 } else {
                     $tii['dtstart']  = rawurlencode(date('Y-m-d H:i:s', $module->timeavailable));
                 }
-            	if(isset($dates->timedue)) {
-                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $dates->timedue));
+            	if(isset($dates['timedue'])) {
+                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $dates['timedue']));
                 }elseif (empty($module->timedue)) {
                     $tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', time()+(365 * 24 * 60 * 60)));
                 } else {
                     $tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $module->timedue));
                 }
-            	if(isset($dates->feedback)) {
-                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $dates->feedback));
+            	if(isset($dates['feedback'])) {
+                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $dates['feedback']));
                 }else {
                     $tii['dtpost']    = rawurlencode(date('Y-m-d H:i:s', $module->timedue+(365 * 24 * 60 * 60)));
                 }
