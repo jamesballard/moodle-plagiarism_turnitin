@@ -1150,7 +1150,7 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
     
     //Check whether the module has a date definition function
     require_once("$CFG->dirroot/mod/".$eventdata->modulename."/locallib.php"); //JB - Get localib from module to check which values this needs to send
-    $date_function = $module->name."_plagiarism_dates";
+    $date_function = $eventdata->modulename."_plagiarism_dates";
     if(function_exists($date_function)) {
        $dates = $date_function($cm->id);
     } 
