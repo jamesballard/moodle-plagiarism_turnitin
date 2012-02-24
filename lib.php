@@ -1123,7 +1123,7 @@ function turnitin_error_text($statuscode, $notify=true) {
  * @return boolean  returns false if unexpected error occurs.
  */
 function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eventdata, $action) {
-    global $DB;
+    global $CFG,$DB;
     $result = true;
     if ($action=='delete') {
         //delete function deliberately not handled (fid=8)
@@ -1149,9 +1149,9 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
     }
     
     //Check whether the module has a date definition function
-    require_once("$CFG->dirroot/mod/".$module->name."/locallib.php"); //JB - Get localib from module to check which values this needs to send
+    require_once("$CFG->dirroot/mod/".$eventdata->modulename."/locallib.php"); //JB - Get localib from module to check which values this needs to send
     $date_function = $module->name."_plagiarism_dates";
-    if(function_exists($submission_function)) {
+    if(function_exists($date_function)) {
        $dates = $date_function($cm->id);
     } 
     
