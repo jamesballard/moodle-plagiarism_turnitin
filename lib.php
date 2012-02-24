@@ -788,8 +788,8 @@ function turnitin_get_md5string($tii, $plagiarismsettings) {
                 $tii['diagnostic'].
                 $tii['dis'].
                 $tii['dtdue'].
-                $tii['dtstart'].
                 $tii['dtpost'].
+                $tii['dtstart'].
                 $tii['encrypt'].
                 $tii['fcmd'].
                 $tii['fid'].
