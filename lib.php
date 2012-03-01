@@ -1305,14 +1305,14 @@ function turnitin_update_assignment($plagiarismsettings, $plagiarismvalues, $eve
                         $tii['dtdue']    = rawurlencode(date($tunitindateformat, $module->timedue));
                     }
                 }
-            	if(isset($dates->timeavailable)) {
-                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $dates->timeavailable));
+            	if(isset($dates['timeavailable'])) {
+                	$tii['dtstart'] = rawurlencode(date('Y-m-d H:i:s', $dates['timeavailable']));
                 }
-            	if(isset($dates->timedue)) {
-                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $dates->timedue));
+            	if(isset($dates['timedue'])) {
+                	$tii['dtdue'] = rawurlencode(date('Y-m-d H:i:s', $dates['timedue']));
                 }
-            	if(isset($dates->feedback)) {
-                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $dates->feedback));
+            	if(isset($dates['feedback'])) {
+                	$tii['dtpost'] = rawurlencode(date('Y-m-d H:i:s', $dates['feedback']));
                 }
                 $tiixml = turnitin_post_data($tii, $plagiarismsettings);
             }
